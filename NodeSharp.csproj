@@ -1,0 +1,83 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Antlr4" Version="4.6.6">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Antlr4.Runtime" Version="4.6.6" />
+      <PackageReference Include="Bond.Core.CSharp" Version="10.0.0" />
+      <PackageReference Include="Bond.CSharp" Version="10.0.0" />
+      <PackageReference Include="Bond.Runtime.CSharp" Version="10.0.0" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.2-beta2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="Grammar\NodeSharpLexer.g4" />
+      <Content Include="Grammar\NodeSharpParser.g4" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Test FIles\test.ns">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Test FIles\Test.mvar.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Test FIles\All Objects And Nodes.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Test FIles\CATA_Canvas__spawnblock.mvar.xml.blob_000">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Test FIles\CATA_Canvas__spawnblock.mvar.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Test FIles\Geometry.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Test FIles\Behemoth.mvar.xml.blob_000">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Test FIles\Behemoth.mvar.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Test FIles\Replace.mvar.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Remove="gen\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="InfiniteForgeConstants">
+        <HintPath>InfiniteForgeConstants.dll</HintPath>
+      </Reference>
+      <Reference Include="InfiniteForgePacker">
+        <HintPath>InfiniteForgePacker.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="gen\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <BondCodegen Remove="gen\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="gen\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="NodeGraph\Nodes\Variable\Constant" />
+    </ItemGroup>
+
+</Project>
