@@ -6,7 +6,7 @@ namespace NodeSharp.NodeGraph.Nodes;
 
 public class SquareRootNumberNode : Node, GetterInterface
 {
-    public SquareRootNumberNode(ScriptBrain brain, VariableNode a) : base(brain, NodeTypes.Square_Root_Number)
+    public SquareRootNumberNode(ScriptBrain brain, GetterInterface a) : base(brain, NodeTypes.Square_Root_Number)
     {
         ImplementationNodeData = new[]
         {

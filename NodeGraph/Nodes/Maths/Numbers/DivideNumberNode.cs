@@ -6,7 +6,7 @@ namespace NodeSharp.NodeGraph.Nodes;
 
 public class DivideNumberNode : Node, GetterInterface
 {
-    public DivideNumberNode(ScriptBrain brain, VariableNode a, VariableNode b) : base(brain, NodeTypes.Divide_Number)
+    public DivideNumberNode(ScriptBrain brain, GetterInterface a, GetterInterface b) : base(brain, NodeTypes.Divide_Number)
     {
         ImplementationNodeData = new[]
         {

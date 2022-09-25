@@ -68,6 +68,8 @@ using InfiniteForgePacker.XML;
 using NodeSharp;
 using NodeSharp.Game;
 using NodeSharp.Grammar;
+using NodeSharp.NodeGraph.NodeData;
+using NodeSharp.Nodes.Variable;
 using NodeSharp.XMLImplementation.Objects;
 
 var fileName = "Test Files/test.ns";
@@ -80,7 +82,7 @@ NodeSharpParser nSharpParser = new NodeSharpParser(commonTokenStream);
 NodeSharpParser.ProgramContext nSharpContext = nSharpParser.program();
 NSharpVisitor visitor = new NSharpVisitor();
 
-visitor.Visit(nSharpContext);
+ visitor.Visit(nSharpContext);
 
 XDocument document = XDocument.Load("Test Files/Test.mvar.xml");
 

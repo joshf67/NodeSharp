@@ -6,7 +6,7 @@ namespace NodeSharp.NodeGraph.Nodes;
 
 public class MultiplyNumberNode : Node, GetterInterface
 {
-    public MultiplyNumberNode(ScriptBrain brain, VariableNode a, VariableNode b) : base(brain, NodeTypes.Multiply_Number)
+    public MultiplyNumberNode(ScriptBrain brain, GetterInterface a, GetterInterface b) : base(brain, NodeTypes.Multiply_Number)
     {
         ImplementationNodeData = new[]
         {

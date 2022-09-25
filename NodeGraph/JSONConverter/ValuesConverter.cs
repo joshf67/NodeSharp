@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Numerics;
+using Newtonsoft.Json;
 using NodeSharp.NodeGraph.NodeData;
 
 namespace NodeSharp.JSONConverter;
@@ -89,6 +90,10 @@ public class ValuesConverter : JsonConverter
                 writer.WriteValue((float)value);
                 break;
             
+            case DataType.Object:
+                throw new Exception("Are you sure you're supposed to be writing an Object");
+                break;
+
             default :
                 throw new NotImplementedException();
         }

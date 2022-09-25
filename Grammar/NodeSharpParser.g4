@@ -24,7 +24,7 @@ array: '[' expression_list ']';
 getProperty: (SCOPE)? IDENTIFIER '.' IDENTIFIER;
 
 expression_list
-	: expression (',' WHITESPACES* expression)*
+	: expression (WHITESPACES* ',' WHITESPACES* expression)*
 	;
 
 expression
@@ -46,13 +46,13 @@ expression
 
 internal_functionCall
     : trigonometryOp '(' expression ')'                                         #trigonometryExpression
-    | 'arctan2' '(' expression WHITESPACES* ',' WHITESPACES* expression ')'     #trigonometryArcTan2Expression
+    | 'Arctan2' '(' expression WHITESPACES* ',' WHITESPACES* expression ')'     #trigonometryArcTan2Expression
     ;
 
-constant: VECTOR3 | NUMBER | STRING | BOOL | NULL;
+constant: BOOL | VECTOR3 | NUMBER | STRING | NULL | AREA_MONITOR | EQUIPMENT_TYPE | GRENADE_TYPE;
 multiplyOp: '*' | '/' | '%' | '^'| '^^';
 additionOp: '+' | '-';
 arithmeticOp: '+=' | '-=' | '*=' | '/=' | '^=' | '^^=';
 affixOp: '++' | '--';
-trigonometryOp: 'sin' | 'cos' | 'tan' | 'arcsin' | 'arccos';
+trigonometryOp: 'Sin' | 'Cos' | 'Tan' | 'Arcsin' | 'Arccos';
 comparisonOp: '==' | '!=' | '>' | '<' | '>=' | '<=';

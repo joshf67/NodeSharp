@@ -6,8 +6,6 @@ public class NumberNode : VariableNode
 {
     public NumberNode(ScriptBrain brain, VariableData data, int originId = -1, string originPin = "") : base(brain, NodeTypes.Number, data)
     {
-        NodeData = data;
-        
         if (data.Scope == ScopeEnum.Constant)
         {
             ImplementationNodeData = new[]

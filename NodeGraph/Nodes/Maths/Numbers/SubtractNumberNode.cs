@@ -6,7 +6,7 @@ namespace NodeSharp.NodeGraph.Nodes;
 
 public class SubtractNumberNode : Node, GetterInterface
 {
-    public SubtractNumberNode(ScriptBrain brain, VariableNode a, VariableNode b) : base(brain, NodeTypes.Subtract_Number)
+    public SubtractNumberNode(ScriptBrain brain, GetterInterface a, GetterInterface b) : base(brain, NodeTypes.Subtract_Number)
     {
         ImplementationNodeData = new[]
         {

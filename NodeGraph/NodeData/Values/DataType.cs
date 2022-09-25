@@ -6,4 +6,5 @@ public static class DataType
     public const string UShort = "UShort";
     public const string Float = "Float";
     public const string Int = "Int";
+    public const string Object = "Object";
 }

@@ -1,16 +1,17 @@
 lexer grammar NodeSharpLexer;
+
 IF:                     'if';
 ELSE_IF:                'else if';
 ELSE:                   'else';
 WHILE:                  'while';
 FUNCTION:               'function';
 
-SIN:                    'sin';
-COS:                    'cos';
-TAN:                    'tan';
-ARCSIN:                 'arcsin';
-ARCCOS:                 'arccos';
-ARCTAN2:                'arctan2';
+SIN:                    'Sin';
+COS:                    'Cos';
+TAN:                    'Tan';
+ARCSIN:                 'Arcsin';
+ARCCOS:                 'Arccos';
+ARCTAN2:                'Arctan2';
 
 OPEN_BRACE:             '{';
 CLOSE_BRACE:            '}';
@@ -22,6 +23,8 @@ DOT:                    '.';
 COMMA:                  ',';
 SEMICOLON:              ';';
 
+
+//Operators
 PLUS:                   '+';
 MINUS:                  '-';
 STAR:                   '*';
@@ -49,6 +52,7 @@ OP_DIV_ASSIGNMENT:      '/=';
 OP_MOD_ASSIGNMENT:      '%=';
 OP_POW_ASSIGNMENT:      '^=';
 OP_SQRT_ASSIGNMENT:     '^^=';
+
 
 WHITESPACES:   (Whitespace | NewLine)+ -> skip;
 
@@ -86,12 +90,18 @@ fragment UnicodeClassZS
 	| '\u205F' // MEDIUM MATHEMATICAL SPACE
 	;
 	
-VECTOR3: 'Vector3(' NUMBER ', ' NUMBER ', ' NUMBER ')';
+//Variable Types
+
+VECTOR3: 'Vector3(' WHITESPACES* NUMBER WHITESPACES* ',' WHITESPACES* NUMBER WHITESPACES* ',' WHITESPACES* NUMBER WHITESPACES* ')';
 NUMBER: [0-9]+ | ([0-9.]+ '.' [0-9]+);
 
-STRING: ('"' ~'"'* '"') | ('\'' ~'\''* '\'');
+STRING: 'String.' IDENTIFIER;
 BOOL: 'true' | 'false';
 NULL: 'null';
 
-IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
+AREA_MONITOR: 'AreaMonitor';
+EQUIPMENT_TYPE: 'EquipmentType';
+GRENADE_TYPE: 'GrenadeType';
+
 SCOPE: ('global ' | 'Global ' | 'local ' | 'Local ') WHITESPACES*;
+IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;

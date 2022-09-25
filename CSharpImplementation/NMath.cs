@@ -13,12 +13,12 @@ public static class NMath
     {
         return op switch
         {
-            "+=" => Add(brain, (VariableNode)left, (VariableNode)right),
-            "-=" => Subtract(brain, left, right),
-            "*=" => Multiply(left, right),
-            "/=" => Divide(left, right),
-            "^=" => Power(left, right),
-            "^^=" => Sqrt(left),
+            // "+=" => Add(brain, (VariableNode)left, (VariableNode)right),
+            // "-=" => Subtract(brain, left, right),
+            // "*=" => Multiply(left, right),
+            // "/=" => Divide(left, right),
+            // "^=" => Power(left, right),
+            // "^^=" => Sqrt(left),
             _ => throw new NotImplementedException()
         };
     }
@@ -28,17 +28,17 @@ public static class NMath
         return op switch
         {
             "+" => Add(brain, (GetterInterface)left, (GetterInterface)right),
-            "-" => Subtract(brain, left, right),
+            "-" => Subtract(brain, (GetterInterface)left, (GetterInterface)right),
             _ => throw new NotImplementedException()
         };
     }
     
-    public static object? Multiplication(string op, object? left, object? right)
+    public static object? Multiplication(ScriptBrain brain, string op, object? left, object? right)
     {
         return op switch
         {
-            "*" => Multiply(left, right),
-            "/" => Divide(left, right),
+            "*" => Multiply(brain, (GetterInterface)left, (GetterInterface)right),
+            "/" => Divide(brain, (GetterInterface)left, (GetterInterface)right),
             "%" => Remainder(left, right),
             "^" => Power(left, right),
             _ => throw new NotImplementedException()
@@ -60,15 +60,18 @@ public static class NMath
         };
     }
     
-    public static object? Multiply(object? left, object? right)
+    public static Node Multiply(ScriptBrain brain, GetterInterface left, GetterInterface right)
     {
-        return left switch
-        {
-            Vector3 lv when right is float r => new Vector3(lv.X * r, lv.Y * r, lv.Z * r),
-            float l when right is Vector3 rv => new Vector3(l * rv.X, l * rv.Y, l * rv.Z),
-            float lf when right is float rf => lf * rf,
-            _ => throw new Exception($"Cannot multiply values of types {left?.GetType()} and {right?.GetType()}.")
-        };
+        // return left switch
+        // {
+        //     Vector3 lv when right is float r => new Vector3(lv.X * r, lv.Y * r, lv.Z * r),
+        //     float l when right is Vector3 rv => new Vector3(l * rv.X, l * rv.Y, l * rv.Z),
+        //     float lf when right is float rf => lf * rf,
+        //     _ => throw new Exception($"Cannot multiply values of types {left?.GetType()} and {right?.GetType()}.")
+        // };
+        
+        var ret = new MultiplyNumberNode(brain, left, right);
+        return ret;
     }
 
     public static object? Power(object? left, object? right)
@@ -79,23 +82,30 @@ public static class NMath
         throw new Exception($"Cannot power values of types {left?.GetType()} and {right?.GetType()}.");
     }
     
-    public static object? Sqrt(object? left)
+    public static Node Sqrt(ScriptBrain brain, GetterInterface left)
     {
-        if (left is float l)
-            return (float)Math.Sqrt(l);
-
-        throw new Exception($"Cannot square root value with type {left?.GetType()}.");
+        var ret = new SquareRootNumberNode(brain, left);
+        return ret;
+        // if (left is float l)
+        //     return (float)Math.Sqrt(l);
+        //
+        // throw new Exception($"Cannot square root value with type {left?.GetType()}.");
     }
     
-    public static object? Divide(object? left, object? right)
+    public static Node Divide(ScriptBrain brain, GetterInterface left, GetterInterface right)
     {
-        return left switch
-        {
-            Vector3 lv when right is float r => new Vector3(lv.X / r, lv.Y / r, lv.Z / r),
-            float l when right is Vector3 rv => new Vector3(l / rv.X, l / rv.Y, l / rv.Z),
-            float lf when right is float rf => lf / rf,
-            _ => throw new Exception($"Cannot divide values of types {left?.GetType()} and {right?.GetType()}.")
-        };
+        // return left switch
+        // {
+        //     Vector3 lv when right is float r => new Vector3(lv.X / r, lv.Y / r, lv.Z / r),
+        //     float l when right is Vector3 rv => new Vector3(l / rv.X, l / rv.Y, l / rv.Z),
+        //     float lf when right is float rf => lf / rf,
+        //     _ => throw new Exception($"Cannot divide values of types {left?.GetType()} and {right?.GetType()}.")
+        // };
+        
+        var ret = new DivideNumberNode(brain, left, right);
+        return ret;
+
+        // throw new Exception($"Cannot divide values of types {left?.GetType()} and {right?.GetType()}.");
     }
     
     public static object? Remainder(object? left, object? right)
@@ -162,15 +172,17 @@ public static class NMath
         // throw new Exception($"Cannot add values of types {left?.GetType()} and {right?.GetType()}.");
     }
     
-    public static object? Subtract(ScriptBrain brain, object? left, object? right)
+    public static object? Subtract(ScriptBrain brain, GetterInterface left, GetterInterface right)
     {
-        if (left is Vector3 lv && right is Vector3 rv)
-            return new Vector3(lv.X - rv.X, lv.Y - rv.Y, lv.Z - rv.Z);
+        var ret = new SubtractNumberNode(brain, left, right);
+        return ret;
+        // if (left is Vector3 lv && right is Vector3 rv)
+        //     return new Vector3(lv.X - rv.X, lv.Y - rv.Y, lv.Z - rv.Z);
+        //
+        // if (left is float l && right is float f)
+        //     return l - f;
 
-        if (left is float l && right is float f)
-            return l - f;
-
-        throw new Exception($"Cannot add values of types {left?.GetType()} and {right?.GetType()}.");
+        // throw new Exception($"Cannot add values of types {left?.GetType()} and {right?.GetType()}.");
     }
     
     public static bool IsEquals(object? left, object? right)
