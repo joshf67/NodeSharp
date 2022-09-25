@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
 using Antlr4.Runtime.Tree;
+using InfiniteForgeConstants.NodeGraphSettings;
 using NodeSharp.Grammar;
 using NodeSharp.NodeGraph.NodeData;
 using NodeSharp.NodeGraph.Nodes;
@@ -239,9 +240,14 @@ public class NSharpVisitor : NodeSharpParserBaseVisitor<object?>
             if (Getter.ConnectionVariableType == typeof(float))
                 Node = new NumberNode(testBrain, NodeData, Getter.OriginNode, Getter.OriginPin);
 
+            if (Getter.ConnectionVariableType == typeof(bool))
+                Node = new BooleanNode(testBrain, NodeData, Getter.OriginNode, Getter.OriginPin);
 
-
-
+            if (Getter.ConnectionVariableType == typeof(StringTypes))
+                Node = new StringNode(testBrain, NodeData, Getter.OriginNode, Getter.OriginPin);
+            
+            if (Getter.ConnectionVariableType == typeof(Vector3))
+                Node = new Vector3Node(testBrain, NodeData, Getter.OriginNode, Getter.OriginPin);
 
             if (Node is null)
                 throw new NotImplementedException(
@@ -376,19 +382,6 @@ public class NSharpVisitor : NodeSharpParserBaseVisitor<object?>
         return null;
     }
     
-    private VariableNode GetConstantNumber(float value)
-    {
-        VariableNode ret = GetConstantVariable(value);
-        if (ret == null)
-        {
-            VariableData NodeData = new VariableData(value, IdentifierVariables.Count, scope: ScopeEnum.Constant);
-            ret = new Nodes.Variable.NumberNode(testBrain, NodeData);
-            ConstantVariables[value] = ret;
-        }
-
-        return ret;
-    }
-    
     private VariableNode? GetConstantVariable(object? value)
     {
         if (ConstantVariables.ContainsKey(value))
@@ -411,22 +404,66 @@ public class NSharpVisitor : NodeSharpParserBaseVisitor<object?>
 
     public override object? VisitConstant(NodeSharpParser.ConstantContext context)
     {
+        VariableNode? ret = null;
+        
         if (context.NUMBER() is { } i)
-            return GetConstantNumber(float.Parse(i.GetText()));
+        {
+            ret = GetConstantVariable(float.Parse(i.GetText()));
+            if (ret == null)
+            {
+                VariableData NodeData = new VariableData(float.Parse(i.GetText()), scope: ScopeEnum.Constant);
+                ret = new NumberNode(testBrain, NodeData);
+                ConstantVariables[float.Parse(i.GetText())] = ret;
+            }
 
+            return ret;
+        }
+        
         if (context.VECTOR3() is {} v)
         {
             var values = v.GetText().Split(",");
-            return new Vector3(float.Parse(values[0][8..]),
+            var value = new Vector3(float.Parse(values[0][8..]),
                 float.Parse(values[1].Replace(" ", "")),
                 float.Parse(values[2].Replace(" ", "")[..^1]));
+            
+            ret = GetConstantVariable(value);
+            if (ret == null)
+            {
+                VariableData NodeData = new VariableData(value, scope: ScopeEnum.Constant);
+                ret = new Vector3Node(testBrain, NodeData);
+                ConstantVariables[value] = ret;
+            }
+
+            return ret;
         }
 
         if (context.STRING() is {} s)
-            return s.GetText()[1..^1];
+        {
+            var value = (int)System.Enum.Parse(typeof(StringTypes), s.GetText()[7..], true);
+                
+            ret = GetConstantVariable(value);
+            if (ret == null)
+            {
+                VariableData NodeData = new VariableData(value, scope: ScopeEnum.Constant);
+                ret = new StringNode(testBrain, NodeData);
+                ConstantVariables[value] = ret;
+            }
+
+            return ret;
+        }
 
         if (context.BOOL() is {} b)
-            return b.GetText() == "true";
+        {
+            ret = GetConstantVariable(bool.Parse(b.GetText()));
+            if (ret == null)
+            {
+                VariableData NodeData = new VariableData(bool.Parse(b.GetText()), scope: ScopeEnum.Constant);
+                ret = new BooleanNode(testBrain, NodeData);
+                ConstantVariables[bool.Parse(b.GetText())] = ret;
+            }
+
+            return ret;
+        }
 
         if (context.NULL() is {})
             return null;
@@ -443,8 +480,6 @@ public class NSharpVisitor : NodeSharpParserBaseVisitor<object?>
         return NMath.Compare(op, left, right);
     }
 
-    
-
     public override object? VisitAdditiveExpression(NodeSharpParser.AdditiveExpressionContext context)
     {
         var left = Visit(context.expression(0));
@@ -453,6 +488,11 @@ public class NSharpVisitor : NodeSharpParserBaseVisitor<object?>
         var op = context.additionOp().GetText();
         return NMath.Addition(testBrain, op, left, right);
     }
+    
+    public override object? VisitParenthesizedExpression(NodeSharpParser.ParenthesizedExpressionContext context)
+    {
+        return Visit(context.expression());
+    }
 
     public override object? VisitMultiplicativeExpression(NodeSharpParser.MultiplicativeExpressionContext context)
     {
@@ -460,7 +500,7 @@ public class NSharpVisitor : NodeSharpParserBaseVisitor<object?>
         var right = Visit(context.expression(1));
 
         var op = context.multiplyOp().GetText();
-        return NMath.Multiplication(op, left, right);
+        return NMath.Multiplication(testBrain, op, left, right);
     }
     
     public override object? VisitWhileBlock(NodeSharpParser.WhileBlockContext context)
