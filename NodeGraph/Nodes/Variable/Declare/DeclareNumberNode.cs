@@ -1,10 +1,11 @@
 ﻿using NodeSharp.NodeGraph.NodeData;
+using NodeSharp.Nodes.Interface;
 
 namespace NodeSharp.Nodes.Variable;
 
-public class NumberNode : VariableNode
+public class DeclareNumberNode : VariableNode, IDefaultable
 {
-    public NumberNode(ScriptBrain brain, VariableData data, int originId = -1, string originPin = "") : base(brain, NodeTypes.Number, data)
+    public DeclareNumberNode(ScriptBrain brain, VariableData data, int originId = -1, string originPin = "") : base(brain, NodeTypes.Number, data)
     {
         if (data.Scope == ScopeEnum.Constant)
         {
@@ -46,7 +47,10 @@ public class NumberNode : VariableNode
             };
 
             if (originId != -1)
-                brain.AddConnection(new VariableConnection(typeof(float), NodeID, Keywords.InitialValue, originId, originPin));
+            {
+                Input.Add(new VariableConnection(typeof(float), typeof(DeclareNumberNode), NodeID, Keywords.InitialValue, originId,
+                    originPin));
+            }
         }
     }
 
@@ -54,14 +58,20 @@ public class NumberNode : VariableNode
     {
         if (NodeData.Scope == ScopeEnum.Constant)
         {
-            return new VariableConnection(typeof(float), destinationId, destinationPin, NodeID, Keywords.Out);
+            // if (destinationId != -1)
+                // Output.Add(brain.NodeMap[destinationId].node);
+            return new VariableConnection(typeof(float), typeof(DeclareNumberNode), destinationId, destinationPin, NodeID, Keywords.Out);
         }
-        
+
         if (GetterNode is not null)
-            return new VariableConnection(typeof(float), destinationId, destinationPin, GetterNode.NodeID, Keywords.Out);;
+        {
+            // GetterNode.Output.Add(brain.NodeMap[destinationId].node);
+            return new VariableConnection(typeof(float), typeof(DeclareNumberNode), destinationId, destinationPin, GetterNode.NodeID,
+                Keywords.Out);
+        }
 
         GetterNode = new Node(NodeTypes.Number_Getter,
-            ImplementationNodeData = new[]
+            new[]
             {
                 new Property(null,
                     new List<Values>()
@@ -72,7 +82,7 @@ public class NumberNode : VariableNode
                     })
             },
 
-            Pins = new[]
+            new[]
             {
                 new Pin(Keywords.Identifier),
                 new Pin(Keywords.Scope),
@@ -82,7 +92,10 @@ public class NumberNode : VariableNode
 
         brain.AddNode(GetterNode);
 
-        return new VariableConnection(typeof(float), destinationId, destinationPin, GetterNode.NodeID, Keywords.Out);
+        // GetterNode.Output.Add(brain.NodeMap[destinationId].node);
+            
+        brain.AddReferenceToNode(this);
+        return new VariableConnection(typeof(float), typeof(DeclareNumberNode), destinationId, destinationPin, GetterNode.NodeID, Keywords.Out);
     }
 
     public override (Node Setter, VariableConnection SetterConnection) Setter(ScriptBrain brain, int originId = -1, string originPin = "")
@@ -113,6 +126,20 @@ public class NumberNode : VariableNode
 
         brain.AddNode(setterNode);
         
-        return (setterNode, new VariableConnection(typeof(float), setterNode.NodeID, Keywords.Value, originId, originPin));
+        return (setterNode, new VariableConnection(typeof(float), typeof(DeclareNumberNode), setterNode.NodeID, Keywords.Value, originId, originPin));
+    }
+
+    public override bool Optimize(ScriptBrain brain)
+    {
+        base.Optimize(brain);
+        
+        if (Input.Count is 0) return false;
+        if (brain.NodeMap[Input[0].OriginNode].node is not VariableNode { NodeData.Scope: ScopeEnum.Constant } node) return false;
+        
+        brain.RemoveReferenceToNode(node);
+        Input.Clear();
+
+        ImplementationNodeData[0].Values[0].DataValue = node.NodeData.Data;
+        return false;
     }
 }

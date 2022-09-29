@@ -1,13 +1,12 @@
-﻿using System.Numerics;
-using NodeSharp.NodeGraph.NodeData;
+﻿using NodeSharp.NodeGraph.NodeData;
 using NodeSharp.Nodes.Interface;
 
 namespace NodeSharp.Nodes.Variable;
 
-public class ObjectNode : VariableNode
+public class DeclareBooleanNode : VariableNode, IDefaultable
 {
-    public ObjectNode(ScriptBrain brain, VariableData data, int originId = -1, string originPin = "") : base(brain,
-        NodeTypes.Object, data)
+    public DeclareBooleanNode(ScriptBrain brain, VariableData data, int originId = -1, string originPin = "") : base(brain,
+        NodeTypes.Boolean, data)
     {
         if (data.Scope == ScopeEnum.Constant)
         {
@@ -16,25 +15,26 @@ public class ObjectNode : VariableNode
                 new Property(null,
                     new List<Values>()
                     {
-                        new Values(Keywords.EntryId, DataType.UShort, data.Data?? 0)
+                        new Values(Keywords.Out, DataType.Bool, (bool)(data.Data ?? false))
                     })
             };
 
             Pins = new[]
             {
-                new Pin(Keywords.Object, 0)
+                new Pin(Keywords.Out, 0)
             };
         }
         else
         {
-            NodeType = NodeTypes.Object_Declare;
+            NodeType = NodeTypes.Boolean_Declare;
             
             ImplementationNodeData = new[]
             {
                 new Property(null,
                     new List<Values>()
                     {
-                        new Values(Keywords.ForgeNodeGraph_DisabledFlag, DataType.Bool, true),
+                        // new Values(Keywords.ForgeNodeGraph_DisabledFlag, DataType.Bool, true),
+                        new Values(Keywords.InitialValue, DataType.Bool, (bool)(data.Data ?? false)),
                         new Values(Keywords.Identifier, DataType.UShort, data.Identifier),
                         new Values(Keywords.Scope, DataType.Int, data.Scope)
                     })
@@ -48,7 +48,10 @@ public class ObjectNode : VariableNode
             };
 
             if (originId != -1)
-                brain.AddConnection(new VariableConnection(typeof(object), NodeID, Keywords.InitialValue, originId, originPin));
+            {
+                Input.Add(new VariableConnection(typeof(bool), typeof(DeclareBooleanNode), NodeID, Keywords.InitialValue, originId,
+                    originPin));
+            }
         }
     }
     
@@ -56,14 +59,19 @@ public class ObjectNode : VariableNode
     {
         if (NodeData.Scope == ScopeEnum.Constant)
         {
-            return new VariableConnection(typeof(object), destinationId, destinationPin, NodeID, Keywords.Out);
+            // if (destinationId != -1)
+                // Output.Add(brain.NodeMap[destinationId].node);
+            return new VariableConnection(typeof(bool), typeof(DeclareBooleanNode), destinationId, destinationPin, NodeID, Keywords.Out);
         }
-        
-        if (GetterNode is not null)
-            return new VariableConnection(typeof(object), destinationId, destinationPin, GetterNode.NodeID, Keywords.Out);;
 
-        GetterNode = new Node(NodeTypes.Object_Getter,
-            ImplementationNodeData = new[]
+        if (GetterNode is not null)
+        {
+            // GetterNode.Output.Add(brain.NodeMap[destinationId].node);
+            return new VariableConnection(typeof(bool), typeof(DeclareBooleanNode), destinationId, destinationPin, GetterNode.NodeID, Keywords.Out);
+        }
+
+        GetterNode = new Node(NodeTypes.Boolean_Getter,
+            new[]
             {
                 new Property(null,
                     new List<Values>()
@@ -74,7 +82,7 @@ public class ObjectNode : VariableNode
                     })
             },
 
-            Pins = new[]
+            new[]
             {
                 new Pin(Keywords.Identifier),
                 new Pin(Keywords.Scope),
@@ -83,8 +91,10 @@ public class ObjectNode : VariableNode
             });
 
         brain.AddNode(GetterNode);
-
-        return new VariableConnection(typeof(object), destinationId, destinationPin, GetterNode.NodeID, Keywords.Out);
+            
+        // GetterNode.Output.Add(brain.NodeMap[destinationId].node);
+            
+        return new VariableConnection(typeof(bool), typeof(DeclareBooleanNode), destinationId, destinationPin, GetterNode.NodeID, Keywords.Out);
     }
 
     public override (Node Setter, VariableConnection SetterConnection) Setter(ScriptBrain brain, int originId = -1, string originPin = "")
@@ -92,7 +102,7 @@ public class ObjectNode : VariableNode
         if (NodeData.Scope == ScopeEnum.Constant)
             throw new Exception("Trying to set a constant variable");
         
-        Node setterNode = new Node(NodeTypes.Object_Setter, 
+        Node setterNode = new Node(NodeTypes.Boolean_Setter, 
             new[]
             {
                 new Property(null, 
@@ -100,6 +110,7 @@ public class ObjectNode : VariableNode
                         new Values(Keywords.ForgeNodeGraph_DisabledFlag, DataType.Bool, true),
                         new Values(Keywords.Scope, DataType.Int, NodeData.Scope),
                         new Values(Keywords.Identifier, DataType.UShort, NodeData.Identifier),
+                        new Values(Keywords.Value, DataType.Bool, (bool)(NodeData.Data ?? false))
                     })
             },
             new[]
@@ -114,6 +125,6 @@ public class ObjectNode : VariableNode
 
         brain.AddNode(setterNode);
         
-        return (setterNode, new VariableConnection(typeof(object), setterNode.NodeID, Keywords.Value, originId, originPin));
+        return (setterNode, new VariableConnection(typeof(bool), typeof(DeclareBooleanNode), setterNode.NodeID, Keywords.Value, originId, originPin));
     }
 }

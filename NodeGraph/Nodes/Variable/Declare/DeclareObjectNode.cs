@@ -4,33 +4,30 @@ using NodeSharp.Nodes.Interface;
 
 namespace NodeSharp.Nodes.Variable;
 
-public class Vector3Node : VariableNode
+public class DeclareObjectNode : VariableNode
 {
-    public Vector3Node(ScriptBrain brain, VariableData data, int originId = -1, string originPin = "") : base(brain,
-        NodeTypes.Vector3, data)
+    public DeclareObjectNode(ScriptBrain brain, VariableData data, int originId = -1, string originPin = "") : base(brain,
+        NodeTypes.Object, data)
     {
         if (data.Scope == ScopeEnum.Constant)
         {
-            Vector3 val = (Vector3)(data.Data ?? Vector3.Zero);
             ImplementationNodeData = new[]
             {
                 new Property(null,
                     new List<Values>()
                     {
-                        new Values(Keywords.X, DataType.Float, val.X),
-                        new Values(Keywords.Y, DataType.Float, val.Y),
-                        new Values(Keywords.Z, DataType.Float, val.Z)
+                        new Values(Keywords.EntryId, DataType.UShort, data.Data?? 0)
                     })
             };
 
             Pins = new[]
             {
-                new Pin(Keywords.Out, 0)
+                new Pin(Keywords.Object, 0)
             };
         }
         else
         {
-            NodeType = NodeTypes.Vector3_Declare;
+            NodeType = NodeTypes.Object_Declare;
             
             ImplementationNodeData = new[]
             {
@@ -51,7 +48,10 @@ public class Vector3Node : VariableNode
             };
 
             if (originId != -1)
-                brain.AddConnection(new VariableConnection(typeof(Vector3), NodeID, Keywords.InitialValue, originId, originPin));
+            {
+                Input.Add(new VariableConnection(typeof(object), typeof(DeclareObjectNode), NodeID, Keywords.InitialValue, originId,
+                    originPin));
+            }
         }
     }
     
@@ -59,14 +59,20 @@ public class Vector3Node : VariableNode
     {
         if (NodeData.Scope == ScopeEnum.Constant)
         {
-            return new VariableConnection(typeof(Vector3), destinationId, destinationPin, NodeID, Keywords.Out);
+            // if (destinationId != -1)
+                // Output.Add(brain.NodeMap[destinationId].node);
+            return new VariableConnection(typeof(object), typeof(DeclareObjectNode), destinationId, destinationPin, NodeID, Keywords.Out);
         }
-        
-        if (GetterNode is not null)
-            return new VariableConnection(typeof(Vector3), destinationId, destinationPin, GetterNode.NodeID, Keywords.Out);;
 
-        GetterNode = new Node(NodeTypes.Vector3_Getter,
-            ImplementationNodeData = new[]
+        if (GetterNode is not null)
+        {
+            // GetterNode.Output.Add(brain.NodeMap[destinationId].node);
+            return new VariableConnection(typeof(object), typeof(DeclareObjectNode), destinationId, destinationPin, GetterNode.NodeID,
+                Keywords.Out);
+        }
+
+        GetterNode = new Node(NodeTypes.Object_Getter,
+            new[]
             {
                 new Property(null,
                     new List<Values>()
@@ -77,7 +83,7 @@ public class Vector3Node : VariableNode
                     })
             },
 
-            Pins = new[]
+            new[]
             {
                 new Pin(Keywords.Identifier),
                 new Pin(Keywords.Scope),
@@ -87,7 +93,9 @@ public class Vector3Node : VariableNode
 
         brain.AddNode(GetterNode);
 
-        return new VariableConnection(typeof(Vector3), destinationId, destinationPin, GetterNode.NodeID, Keywords.Out);
+        // GetterNode.Output.Add(brain.NodeMap[destinationId].node);
+            
+        return new VariableConnection(typeof(object), typeof(DeclareObjectNode), destinationId, destinationPin, GetterNode.NodeID, Keywords.Out);
     }
 
     public override (Node Setter, VariableConnection SetterConnection) Setter(ScriptBrain brain, int originId = -1, string originPin = "")
@@ -95,7 +103,7 @@ public class Vector3Node : VariableNode
         if (NodeData.Scope == ScopeEnum.Constant)
             throw new Exception("Trying to set a constant variable");
         
-        Node setterNode = new Node(NodeTypes.Vector3_Setter, 
+        Node setterNode = new Node(NodeTypes.Object_Setter, 
             new[]
             {
                 new Property(null, 
@@ -117,6 +125,6 @@ public class Vector3Node : VariableNode
 
         brain.AddNode(setterNode);
         
-        return (setterNode, new VariableConnection(typeof(Vector3), setterNode.NodeID, Keywords.Value, originId, originPin));
+        return (setterNode, new VariableConnection(typeof(object), typeof(DeclareObjectNode), setterNode.NodeID, Keywords.Value, originId, originPin));
     }
 }

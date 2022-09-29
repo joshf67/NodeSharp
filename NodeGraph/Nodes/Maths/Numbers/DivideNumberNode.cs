@@ -4,9 +4,9 @@ using NodeSharp.Nodes.Variable;
 
 namespace NodeSharp.NodeGraph.Nodes;
 
-public class DivideNumberNode : Node, GetterInterface
+public class DivideNumberNode : Node, IGetter
 {
-    public DivideNumberNode(ScriptBrain brain, GetterInterface a, GetterInterface b) : base(brain, NodeTypes.Divide_Number)
+    public DivideNumberNode(ScriptBrain brain, IGetter a, IGetter b) : base(brain, NodeTypes.Divide_Number)
     {
         ImplementationNodeData = new[]
         {
@@ -25,22 +25,22 @@ public class DivideNumberNode : Node, GetterInterface
             new Pin(Keywords.Whole)
         };
         
-        brain.AddConnection(a.Getter(brain, NodeID, Keywords.OperandA));
-        brain.AddConnection(b.Getter(brain, NodeID, Keywords.OperandB));
+        Input.Add(a.Getter(brain, NodeID, Keywords.OperandA));
+        Input.Add(b.Getter(brain, NodeID, Keywords.OperandB));
     }
 
     public VariableConnection Getter(ScriptBrain brain, int destinationId = -1, string destinationPin = "")
     {
-        return new VariableConnection(typeof(float), destinationId, destinationPin, NodeID, Keywords.Quotient);
+        return new VariableConnection(typeof(float), typeof(DeclareNumberNode), destinationId, destinationPin, NodeID, Keywords.Quotient);
     }
 
     public VariableConnection Remainder(int destinationId = -1, string destinationPin = "")
     {
-        return new VariableConnection(typeof(float), destinationId, destinationPin, NodeID, Keywords.Remainder);
+        return new VariableConnection(typeof(float), typeof(DeclareNumberNode), destinationId, destinationPin, NodeID, Keywords.Remainder);
     }
     
     public VariableConnection IntResult(int destinationId = -1, string destinationPin = "")
     {
-        return new VariableConnection(typeof(float), destinationId, destinationPin, NodeID, Keywords.Whole);
+        return new VariableConnection(typeof(float), typeof(DeclareNumberNode), destinationId, destinationPin, NodeID, Keywords.Whole);
     }
 }

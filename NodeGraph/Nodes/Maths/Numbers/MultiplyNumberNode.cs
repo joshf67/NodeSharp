@@ -4,9 +4,9 @@ using NodeSharp.Nodes.Variable;
 
 namespace NodeSharp.NodeGraph.Nodes;
 
-public class MultiplyNumberNode : Node, GetterInterface
+public class MultiplyNumberNode : Node, IGetter
 {
-    public MultiplyNumberNode(ScriptBrain brain, GetterInterface a, GetterInterface b) : base(brain, NodeTypes.Multiply_Number)
+    public MultiplyNumberNode(ScriptBrain brain, IGetter a, IGetter b) : base(brain, NodeTypes.Multiply_Number)
     {
         ImplementationNodeData = new[]
         {
@@ -23,12 +23,12 @@ public class MultiplyNumberNode : Node, GetterInterface
             new Pin(Keywords.Result)
         };
         
-        brain.AddConnection(a.Getter(brain, NodeID, Keywords.OperandA));
-        brain.AddConnection(b.Getter(brain, NodeID, Keywords.OperandB));
+        Input.Add(a.Getter(brain, NodeID, Keywords.OperandA));
+        Input.Add(b.Getter(brain, NodeID, Keywords.OperandB));
     }
 
     public VariableConnection Getter(ScriptBrain brain, int destinationId = -1, string destinationPin = "")
     {
-        return new VariableConnection(typeof(float), destinationId, destinationPin, NodeID, Keywords.Result);
+        return new VariableConnection(typeof(float), typeof(DeclareNumberNode), destinationId, destinationPin, NodeID, Keywords.Result);
     }
 }

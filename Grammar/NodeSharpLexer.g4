@@ -97,7 +97,6 @@ NUMBER: [0-9]+ | ([0-9.]+ '.' [0-9]+);
 
 STRING: 'String.' IDENTIFIER;
 BOOL: 'true' | 'false';
-NULL: 'null';
 
 AREA_MONITOR: 'AreaMonitor';
 EQUIPMENT_TYPE: 'EquipmentType';

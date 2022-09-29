@@ -75,7 +75,7 @@ public class ValuesConverter : JsonConverter
         switch (type)
         {
             case DataType.Bool:
-                writer.WriteValue((bool)value);
+                writer.WriteValue(Convert.ToBoolean(value));
                 break;
             
             case DataType.UShort: 
@@ -83,11 +83,11 @@ public class ValuesConverter : JsonConverter
                 break;
             
             case DataType.Int: 
-                writer.WriteValue((int)value);
+                writer.WriteValue(Convert.ToInt32(value));
                 break;
             
             case DataType.Float: 
-                writer.WriteValue((float)value);
+                writer.WriteValue(Convert.ToSingle(value));
                 break;
             
             case DataType.Object:

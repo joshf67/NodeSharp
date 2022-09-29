@@ -3,7 +3,7 @@ using NodeSharp.Nodes.Interface;
 
 namespace NodeSharp.Nodes.Variable;
 
-public abstract class VariableNode : Node, GetterInterface
+public abstract class VariableNode : Node, IGetter
 {
     [JsonIgnore] public VariableData NodeData;
     [JsonIgnore] public Node? GetterNode;

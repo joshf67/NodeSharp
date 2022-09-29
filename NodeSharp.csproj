@@ -76,4 +76,9 @@
       <EmbeddedResource Remove="gen\**" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="NodeGraph\Nodes\Variable\Getter" />
+      <Folder Include="NodeGraph\Nodes\Variable\Setter" />
+    </ItemGroup>
+
 </Project>

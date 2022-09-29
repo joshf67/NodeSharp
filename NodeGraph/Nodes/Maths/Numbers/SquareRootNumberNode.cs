@@ -4,9 +4,9 @@ using NodeSharp.Nodes.Variable;
 
 namespace NodeSharp.NodeGraph.Nodes;
 
-public class SquareRootNumberNode : Node, GetterInterface
+public class SquareRootNumberNode : Node, IGetter
 {
-    public SquareRootNumberNode(ScriptBrain brain, GetterInterface a) : base(brain, NodeTypes.Square_Root_Number)
+    public SquareRootNumberNode(ScriptBrain brain, IGetter a) : base(brain, NodeTypes.Square_Root_Number)
     {
         ImplementationNodeData = new[]
         {
@@ -22,11 +22,11 @@ public class SquareRootNumberNode : Node, GetterInterface
             new Pin(Keywords.Result)
         };
         
-        brain.AddConnection(a.Getter(brain, NodeID, Keywords.Operand));
+        Input.Add(a.Getter(brain, NodeID, Keywords.Operand));
     }
 
     public VariableConnection Getter(ScriptBrain brain, int destinationId = -1, string destinationPin = "")
     {
-        return new VariableConnection(typeof(float), destinationId, destinationPin, NodeID, Keywords.Result);
+        return new VariableConnection(typeof(float), typeof(DeclareNumberNode), destinationId, destinationPin, NodeID, Keywords.Result);
     }
 }

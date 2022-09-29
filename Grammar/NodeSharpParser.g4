@@ -49,7 +49,7 @@ internal_functionCall
     | 'Arctan2' '(' expression WHITESPACES* ',' WHITESPACES* expression ')'     #trigonometryArcTan2Expression
     ;
 
-constant: BOOL | VECTOR3 | NUMBER | STRING | NULL | AREA_MONITOR | EQUIPMENT_TYPE | GRENADE_TYPE;
+constant: BOOL | VECTOR3 | NUMBER | STRING | AREA_MONITOR | EQUIPMENT_TYPE | GRENADE_TYPE;
 multiplyOp: '*' | '/' | '%' | '^'| '^^';
 additionOp: '+' | '-';
 arithmeticOp: '+=' | '-=' | '*=' | '/=' | '^=' | '^^=';

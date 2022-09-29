@@ -5,12 +5,20 @@ namespace NodeSharp;
 
 public class VariableConnection : Connection
 {
-    [JsonIgnore] public Type ConnectionVariableType;
+    [JsonIgnore] public Type VariableType;
+    [JsonIgnore] public Type ConnectionNodeType;
 
-    public VariableConnection(Type connectionVariableType, int destinationID, string destinationPin, int originID, string originPin,
+    public VariableConnection(Type variableType, Type connectionNodeType, int destinationID, string destinationPin, int originID, string originPin,
         List<Property> properties = null, int version = 0) : base(destinationID,
         destinationPin, originID, originPin, properties, version)
     {
-        ConnectionVariableType = connectionVariableType;
+        VariableType = variableType;
+        ConnectionNodeType = connectionNodeType;
+    }
+    
+    public VariableConnection(VariableConnection connection) : base(connection)
+    {
+        VariableType = connection.VariableType;
+        ConnectionNodeType = connection.ConnectionNodeType;
     }
 }

@@ -27,8 +27,8 @@ public static class NMath
     {
         return op switch
         {
-            "+" => Add(brain, (GetterInterface)left, (GetterInterface)right),
-            "-" => Subtract(brain, (GetterInterface)left, (GetterInterface)right),
+            "+" => Add(brain, (IGetter)left, (IGetter)right),
+            "-" => Subtract(brain, (IGetter)left, (IGetter)right),
             _ => throw new NotImplementedException()
         };
     }
@@ -37,8 +37,8 @@ public static class NMath
     {
         return op switch
         {
-            "*" => Multiply(brain, (GetterInterface)left, (GetterInterface)right),
-            "/" => Divide(brain, (GetterInterface)left, (GetterInterface)right),
+            "*" => Multiply(brain, (IGetter)left, (IGetter)right),
+            "/" => Divide(brain, (IGetter)left, (IGetter)right),
             "%" => Remainder(left, right),
             "^" => Power(left, right),
             _ => throw new NotImplementedException()
@@ -60,7 +60,7 @@ public static class NMath
         };
     }
     
-    public static Node Multiply(ScriptBrain brain, GetterInterface left, GetterInterface right)
+    public static Node Multiply(ScriptBrain brain, IGetter left, IGetter right)
     {
         // return left switch
         // {
@@ -82,7 +82,7 @@ public static class NMath
         throw new Exception($"Cannot power values of types {left?.GetType()} and {right?.GetType()}.");
     }
     
-    public static Node Sqrt(ScriptBrain brain, GetterInterface left)
+    public static Node Sqrt(ScriptBrain brain, IGetter left)
     {
         var ret = new SquareRootNumberNode(brain, left);
         return ret;
@@ -92,7 +92,7 @@ public static class NMath
         // throw new Exception($"Cannot square root value with type {left?.GetType()}.");
     }
     
-    public static Node Divide(ScriptBrain brain, GetterInterface left, GetterInterface right)
+    public static Node Divide(ScriptBrain brain, IGetter left, IGetter right)
     {
         // return left switch
         // {
@@ -116,7 +116,7 @@ public static class NMath
         throw new Exception($"Cannot find remainder between values of types {left?.GetType()} and {right?.GetType()}.");
     }
     
-    public static Node Add(ScriptBrain brain, GetterInterface left, GetterInterface right)
+    public static Node Add(ScriptBrain brain, IGetter left, IGetter right)
     {
         
         // if (left.NodeData.Data is Vector3 lv && right.NodeData.Data is Vector3 rv)
@@ -172,7 +172,7 @@ public static class NMath
         // throw new Exception($"Cannot add values of types {left?.GetType()} and {right?.GetType()}.");
     }
     
-    public static object? Subtract(ScriptBrain brain, GetterInterface left, GetterInterface right)
+    public static object? Subtract(ScriptBrain brain, IGetter left, IGetter right)
     {
         var ret = new SubtractNumberNode(brain, left, right);
         return ret;

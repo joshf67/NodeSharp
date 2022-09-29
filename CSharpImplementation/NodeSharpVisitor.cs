@@ -43,7 +43,7 @@ public class NSharpVisitor : NodeSharpParserBaseVisitor<object?>
         // InternalVariables.Add("InternalFloat", data);
         
         VariableData NodeData = new VariableData(0f, IdentifierVariables.Count, "InternalFloat", ScopeEnum.Global);
-        VariableNode Node = new Nodes.Variable.NumberNode(testBrain, NodeData);
+        VariableNode Node = new Nodes.Variable.DeclareNumberNode(testBrain, NodeData);
         IdentifierVariables.Add("InternalFloat", Node);
         InternalVariables.Add("InternalFloat", Node);
         
@@ -203,7 +203,7 @@ public class NSharpVisitor : NodeSharpParserBaseVisitor<object?>
      *  Implement way to use new VariableNode Getter/Setter instead
      * 
      */
-    private void SetVariable(string name, GetterInterface setTo, ScopeEnum scope = 0)
+    private void SetVariable(string name, IGetter setTo, ScopeEnum scope = 0)
     {
         VariableNode data = GetVariableData(name, scope, false);
         if (data != null)
@@ -221,12 +221,11 @@ public class NSharpVisitor : NodeSharpParserBaseVisitor<object?>
             
             var Setter = data.Setter(testBrain);
             var Getter = setTo.Getter(testBrain, Setter.SetterConnection.DestinationNode, Setter.SetterConnection.DestinationPin);
-            if (Setter.SetterConnection.ConnectionVariableType != Getter.ConnectionVariableType)
-                throw new Exception($"Unable to set variable {name} to value type {Getter.ConnectionVariableType} as their types are different");
+            if (Setter.SetterConnection.ConnectionNodeType != Getter.ConnectionNodeType)
+                throw new Exception($"Unable to set variable {name} to value type {Getter.ConnectionNodeType} as their types are different");
             
             testBrain.AddConnection(Getter);
-            
-            throw new NotImplementedException();
+            // testBrain.NodeMap[Getter.OriginNode].node.Output.Add(Setter.Setter);
         }
         else
         {
@@ -234,26 +233,83 @@ public class NSharpVisitor : NodeSharpParserBaseVisitor<object?>
             //     throw new NotImplementedException();
 
             var Getter = setTo.Getter(testBrain);
-            VariableData NodeData = new VariableData(Activator.CreateInstance(Getter.ConnectionVariableType), IdentifierVariables.Count, name, scope);
+            VariableData NodeData = new VariableData(Activator.CreateInstance(Getter.VariableType), IdentifierVariables.Count, name, scope);
+            
             VariableNode? Node = null;
-            
-            if (Getter.ConnectionVariableType == typeof(float))
-                Node = new NumberNode(testBrain, NodeData, Getter.OriginNode, Getter.OriginPin);
+                //Node = (Node)Activator.CreateInstance(Getter.ConnectionNodeType, );
 
-            if (Getter.ConnectionVariableType == typeof(bool))
-                Node = new BooleanNode(testBrain, NodeData, Getter.OriginNode, Getter.OriginPin);
+                if (testBrain.NodeMap[Getter.OriginNode].node is VariableNode getterNode && getterNode.NodeData.Scope == ScopeEnum.Constant)
+                {
+                    if (Getter.ConnectionNodeType.GetInterface(nameof(IDefaultable)) != null)
+                    {
+                        Node = (VariableNode)Activator.CreateInstance(Getter.ConnectionNodeType, testBrain, NodeData, -1, "");
+                    }
+                    else
+                    {
+                        Node = (VariableNode)Activator.CreateInstance(Getter.ConnectionNodeType, testBrain, NodeData, Getter.OriginNode, Getter.OriginPin);
+                        // testBrain.NodeMap[Getter.OriginNode].node.Output.Add(Node);
+                    }
+                }
+                else
+                {
+                    Node = (VariableNode)Activator.CreateInstance(Getter.ConnectionNodeType, testBrain, NodeData, Getter.OriginNode, Getter.OriginPin);
+                    // testBrain.NodeMap[Getter.OriginNode].node.Output.Add(Node);
+                }
 
-            if (Getter.ConnectionVariableType == typeof(StringTypes))
-                Node = new StringNode(testBrain, NodeData, Getter.OriginNode, Getter.OriginPin);
-            
-            if (Getter.ConnectionVariableType == typeof(Vector3))
-                Node = new Vector3Node(testBrain, NodeData, Getter.OriginNode, Getter.OriginPin);
+            //     if (Getter.ConnectionVariableType == typeof(float))
+            // {
+            //     if (testBrain.NodeMap[Getter.OriginNode].node is VariableNode getterNode && getterNode.NodeData.Scope == ScopeEnum.Constant)
+            //     {
+            //         Node = new DeclareNumberNode(testBrain, NodeData);
+            //     }
+            //     else
+            //     {
+            //         Node = new DeclareNumberNode(testBrain, NodeData, Getter.OriginNode, Getter.OriginPin);
+            //     }
+            // }
+            //
+            // if (Getter.ConnectionVariableType == typeof(bool))
+            // {
+            //     if (testBrain.NodeMap[Getter.OriginNode].node is VariableNode getterNode && getterNode.NodeData.Scope == ScopeEnum.Constant)
+            //     {
+            //         Node = new DeclareBooleanNode(testBrain, NodeData);
+            //     }
+            //     else
+            //     {
+            //         Node = new DeclareBooleanNode(testBrain, NodeData, Getter.OriginNode, Getter.OriginPin);
+            //     }
+            // }
+            //
+            // if (Getter.ConnectionVariableType == typeof(StringTypes))
+            // {
+            //     if (testBrain.NodeMap[Getter.OriginNode].node is VariableNode getterNode && getterNode.NodeData.Scope == ScopeEnum.Constant)
+            //     {
+            //         Node = new DeclareStringNode(testBrain, NodeData);
+            //     }
+            //     else
+            //     {
+            //         Node = new DeclareStringNode(testBrain, NodeData, Getter.OriginNode, Getter.OriginPin);
+            //     }
+            // }
+            //
+            // if (Getter.ConnectionVariableType == typeof(Vector3))
+            // {
+            //     if (testBrain.NodeMap[Getter.OriginNode].node is VariableNode getterNode && getterNode.NodeData.Scope == ScopeEnum.Constant)
+            //     {
+            //         Node = new DeclareVector3Node(testBrain, NodeData);
+            //     }
+            //     else
+            //     {
+            //         Node = new DeclareVector3Node(testBrain, NodeData, Getter.OriginNode, Getter.OriginPin);
+            //     }
+            // }
 
             if (Node is null)
                 throw new NotImplementedException(
-                    $"Node of type {Getter.ConnectionVariableType} has not been setup yet");
+                    $"Node of type {Getter.ConnectionNodeType} has not been setup yet");
             
             IdentifierVariables.Add(name, Node);
+            
             
             // var NodeID = testBrain.AddNode(new DeclareNumberNode(0, (int)scope));
             // data = new VariableData(variable.Data, NodeID, IdentifierVariables.Count, scope: scope);
@@ -300,7 +356,7 @@ public class NSharpVisitor : NodeSharpParserBaseVisitor<object?>
     //     SetLocalVariable(name, value);
     //     
     //     // if (value is float val) 
-    //     //     testBrain.AddNode(new NumberNode(val));
+    //     //     testBrain.AddNode(new DeclareNumberNode(val));
     //     //
     //     // LocalVariables[name] = value;
     // }
@@ -374,7 +430,7 @@ public class NSharpVisitor : NodeSharpParserBaseVisitor<object?>
 
         var value = Visit(context.expression());
 
-        if (value is not GetterInterface val)
+        if (value is not IGetter val)
             throw new NotImplementedException();
         
         SetVariable(varName, val, GetScope(context.SCOPE()));
@@ -388,18 +444,6 @@ public class NSharpVisitor : NodeSharpParserBaseVisitor<object?>
             return ConstantVariables[value];
 
         return null;
-
-
-
-        // foreach (var pair in ConstantVariables)
-        // {
-        //     if (pair.Value.Data == value)
-        //     {
-        //         return pair.Value;
-        //     }
-        // }
-        //
-        // return null;
     }
 
     public override object? VisitConstant(NodeSharpParser.ConstantContext context)
@@ -412,7 +456,7 @@ public class NSharpVisitor : NodeSharpParserBaseVisitor<object?>
             if (ret == null)
             {
                 VariableData NodeData = new VariableData(float.Parse(i.GetText()), scope: ScopeEnum.Constant);
-                ret = new NumberNode(testBrain, NodeData);
+                ret = new DeclareNumberNode(testBrain, NodeData);
                 ConstantVariables[float.Parse(i.GetText())] = ret;
             }
 
@@ -430,7 +474,7 @@ public class NSharpVisitor : NodeSharpParserBaseVisitor<object?>
             if (ret == null)
             {
                 VariableData NodeData = new VariableData(value, scope: ScopeEnum.Constant);
-                ret = new Vector3Node(testBrain, NodeData);
+                ret = new DeclareVector3Node(testBrain, NodeData);
                 ConstantVariables[value] = ret;
             }
 
@@ -445,7 +489,7 @@ public class NSharpVisitor : NodeSharpParserBaseVisitor<object?>
             if (ret == null)
             {
                 VariableData NodeData = new VariableData(value, scope: ScopeEnum.Constant);
-                ret = new StringNode(testBrain, NodeData);
+                ret = new DeclareStringNode(testBrain, NodeData);
                 ConstantVariables[value] = ret;
             }
 
@@ -458,15 +502,12 @@ public class NSharpVisitor : NodeSharpParserBaseVisitor<object?>
             if (ret == null)
             {
                 VariableData NodeData = new VariableData(bool.Parse(b.GetText()), scope: ScopeEnum.Constant);
-                ret = new BooleanNode(testBrain, NodeData);
+                ret = new DeclareBooleanNode(testBrain, NodeData);
                 ConstantVariables[bool.Parse(b.GetText())] = ret;
             }
 
             return ret;
         }
-
-        if (context.NULL() is {})
-            return null;
 
         throw new NotImplementedException();
     }

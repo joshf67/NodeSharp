@@ -80,9 +80,12 @@ NodeSharpLexer nSharpLexer = new NodeSharpLexer(inputStream);
 CommonTokenStream commonTokenStream = new CommonTokenStream(nSharpLexer);
 NodeSharpParser nSharpParser = new NodeSharpParser(commonTokenStream);
 NodeSharpParser.ProgramContext nSharpContext = nSharpParser.program();
-NSharpVisitor visitor = new NSharpVisitor();
+//NSharpVisitor visitor = new NSharpVisitor();
+NodeSharpVisitorRefactor visitor = new NodeSharpVisitorRefactor();
 
- visitor.Visit(nSharpContext);
+visitor.Visit(nSharpContext);
+visitor.testBrain.Optimize();
+visitor.testBrain.GenerateConnections();
 
 XDocument document = XDocument.Load("Test Files/Test.mvar.xml");
 

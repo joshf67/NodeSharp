@@ -42,4 +42,14 @@ public class Connection
         Properties = properties?? Properties;
         Version = version;
     }
+
+    public Connection(Connection connection)
+    {
+        DestinationNode = connection.DestinationNode;
+        DestinationPin = connection.DestinationPin;
+        OriginNode = connection.OriginNode;
+        OriginPin = connection.OriginPin;
+        Properties = connection.Properties?? Properties;
+        Version = connection.Version;
+    }
 }

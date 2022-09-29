@@ -1,1 +1,2 @@
-﻿local string = String.assassin;
+﻿local val = 2 + 4;
+local test = local val + 2;
