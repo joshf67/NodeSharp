@@ -41,6 +41,7 @@ public static class NMath
             "/" => Divide(brain, (IGetter)left, (IGetter)right),
             "%" => Remainder(left, right),
             "^" => Power(left, right),
+            "^^" => Sqrt(brain, (IGetter)left),
             _ => throw new NotImplementedException()
         };
     }
@@ -137,7 +138,7 @@ public static class NMath
             //     
             // }
             //
-            // brain.AddConnection(new Connection(nodeId, Keywords.OperandA, left.NodeID, Keywords.Out));
+            // brain.AddConnection(new Connection(nodeId, Keywords.OperandA, left.NodeId, Keywords.Out));
             // }
             // else
             // {
@@ -149,7 +150,7 @@ public static class NMath
             //
             // if (right.NodeData.Scope == ScopeEnum.Constant)
             // {
-            //     brain.AddConnection(new Connection(nodeId, Keywords.OperandB, right.NodeID, Keywords.Out));
+            //     brain.AddConnection(new Connection(nodeId, Keywords.OperandB, right.NodeId, Keywords.Out));
             // }
             // else
             // {
