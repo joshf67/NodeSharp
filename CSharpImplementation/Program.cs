@@ -65,6 +65,7 @@ using System.Xml.Linq;
 using Antlr4.Runtime;
 using InfiniteForgeConstants.ObjectSettings;
 using InfiniteForgePacker.XML;
+using Newtonsoft.Json;
 using NodeSharp;
 using NodeSharp.Game;
 using NodeSharp.Grammar;
@@ -72,25 +73,42 @@ using NodeSharp.NodeGraph.NodeData;
 using NodeSharp.Nodes.Variable;
 using NodeSharp.XMLImplementation.Objects;
 
+//Setup ANTLR
 var fileName = "Test Files/test.ns";
 var fileContents = File.ReadAllText(fileName);
 
 AntlrInputStream inputStream = new AntlrInputStream(fileContents);
 NodeSharpLexer nSharpLexer = new NodeSharpLexer(inputStream);
 CommonTokenStream commonTokenStream = new CommonTokenStream(nSharpLexer);
+
+//Convert user defined functions
+
+
+
 NodeSharpParser nSharpParser = new NodeSharpParser(commonTokenStream);
+
+nSharpParser.AddErrorListener(new AntlrErrorListener());
+
 NodeSharpParser.ProgramContext nSharpContext = nSharpParser.program();
 //NSharpVisitor visitor = new NSharpVisitor();
+
+
+
+//Handle reading the file
 NodeSharpVisitorRefactor visitor = new NodeSharpVisitorRefactor();
-
 visitor.Visit(nSharpContext);
-visitor.testBrain.Optimize();
-visitor.testBrain.GenerateConnections();
 
+//Generate output json data
+//visitor.testBrain.Optimize();
+visitor.testBrain.GenerateConnections(visitor);
+
+//Write data to file
 XDocument document = XDocument.Load("Test Files/Test.mvar.xml");
 
 XMLScriptBrain brain = new XMLScriptBrain("Script",
       new ScriptBrainObject(visitor.IdentifierVariables, visitor.testBrain, transform: new Transform(Vector3.Zero, Vector3.Zero, true, Vector3.One)));
+
+Console.Write(JsonConvert.SerializeObject(brain.BrainObject.Brain, Formatting.Indented));
 
 XElement brainContainer = XMLWriter.WriteStructToContainer(XMLHelper.GetObjectList(document));
 brain.WriteObject(brainContainer, document);
