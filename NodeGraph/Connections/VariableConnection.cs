@@ -3,22 +3,26 @@ using NodeSharp.NodeGraph.NodeData;
 
 namespace NodeSharp;
 
+/*
+ * Maybe change variable node to not accept a connectedVariableNodeType and figure that out dynamically
+ */
+
 public class VariableConnection : Connection
 {
-    [JsonIgnore] public Type VariableType;
-    [JsonIgnore] public Type ConnectionNodeType;
+    [JsonIgnore] public object Variable;
+    [JsonIgnore] public Type ConnectedVariableNodeType;
 
-    public VariableConnection(Type variableType, Type connectionNodeType, int destinationID, string destinationPin, int originID, string originPin,
-        List<Property> properties = null, int version = 0) : base(destinationID,
-        destinationPin, originID, originPin, properties, version)
+    public VariableConnection(object variable, Type connectedVariableNodeType, int destinationId, string destinationPin, int originId, string originPin,
+        List<Property> properties = null, int version = 0) : base(destinationId,
+        destinationPin, originId, originPin, properties, version)
     {
-        VariableType = variableType;
-        ConnectionNodeType = connectionNodeType;
+        Variable = variable;
+        ConnectedVariableNodeType = connectedVariableNodeType;
     }
     
     public VariableConnection(VariableConnection connection) : base(connection)
     {
-        VariableType = connection.VariableType;
-        ConnectionNodeType = connection.ConnectionNodeType;
+        Variable = connection.Variable;
+        ConnectedVariableNodeType = connection.ConnectedVariableNodeType;
     }
 }
