@@ -6,7 +6,7 @@ namespace NodeSharp;
 public class Connection
 {
     [JsonProperty("m_connectionID")]
-    public int ConnectionID = -1;
+    public int ConnectionId = -1;
     
     [JsonProperty("m_connectionType")]
     public string ConnectionType = "DefaultConnection";
@@ -32,12 +32,12 @@ public class Connection
     [JsonProperty("m_version")]
     public int Version = 0;
 
-    public Connection(int destinationID, string destinationPin, int originID, string originPin,
+    public Connection(int destinationId, string destinationPin, int originId, string originPin,
         List<Property> properties = null, int version = 0)
     {
-        DestinationNode = destinationID;
+        DestinationNode = destinationId;
         DestinationPin = destinationPin;
-        OriginNode = originID;
+        OriginNode = originId;
         OriginPin = originPin;
         Properties = properties?? Properties;
         Version = version;

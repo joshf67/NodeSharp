@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using NodeSharp.NodeGraph.NodeData;
+using NodeSharp.Nodes.Interface;
 
 namespace NodeSharp;
 
@@ -12,7 +13,7 @@ public class Node
     public MetaData[] Metadata = new MetaData[] { new MetaData() };
 
     [JsonProperty("m_nodeID")]
-    public int NodeID = -1;
+    public int NodeId = -1;
     
     [JsonProperty("m_nodeName")]
     public string NodeName = "";
@@ -57,7 +58,7 @@ public class Node
             if (brain.NodeMap[Input[i].OriginNode].node.Optimized != false) continue;
             if (!brain.NodeMap[Input[i].OriginNode].node.Optimize(brain)) continue;
             
-            brain.RemoveReferenceToNode(brain.NodeMap[Input[i].OriginNode].node);
+            //brain.RemoveReferenceToNode(brain.NodeMap[Input[i].OriginNode].node);
             Input.RemoveAt(i);
             i--;
         }
