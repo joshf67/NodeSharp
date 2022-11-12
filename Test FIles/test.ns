@@ -1,2 +1,49 @@
-﻿local val = 2 + 4;
-local test = local val + 2;
+﻿//This is a test comment /* local val = 2;
+//comment */
+//local foo = 2; //Declare, Const -- Optimized: Declare
+//local bar = 3; //Declare, Const -- Optimized: Declare
+//local bar = local foo; //Setter, Getter
+//local foo = 2;
+//local foo = 3;
+
+/*
+local Foo = 2;
+local Bar = 3;
+local FooAddBar = local Foo + local Bar;
+local FooMinusBar = local Foo - local Bar;
+local FooTimesBar = local Foo * local Bar;
+local FooDivideBar = local Foo / local Bar;
+local sqrFooBar = local FooTimesBar ^^;
+*/
+
+/*
+local param1 = 10;
+local param2 = 20;
+local res = sqrt(local param1 * local param2);
+*/
+
+/*
+local function test(param1, param2) 
+{
+    local val = 2;
+}
+
+test(23, 32);
+*/
+
+local foo = 123;
+
+local function test()
+ {
+    local foo = 1234;
+ }
+
+if (123) {
+    test();   
+    test();
+    test();
+} else {
+    test();
+} continue;
+    test();
+    //Continue the rest of your code here
