@@ -66,6 +66,17 @@
 
     <ItemGroup>
       <Compile Remove="gen\**" />
+      <Compile Remove="NodeGraph\Nodes\Variable\Getter\BooleanGetterNode.cs" />
+      <Compile Remove="NodeGraph\Nodes\Variable\Getter\Vector3GetterNode.cs" />
+      <Compile Remove="NodeGraph\Nodes\Variable\Declare\DeclareBooleanNode.cs" />
+      <Compile Remove="NodeGraph\Nodes\Variable\Declare\DeclareObjectNode.cs" />
+      <Compile Remove="NodeGraph\Nodes\Variable\Declare\DeclareStringNode.cs" />
+      <Compile Remove="NodeGraph\Nodes\Variable\Declare\DeclareVector3Node.cs" />
+      <Compile Remove="NodeGraph\Nodes\Variable\Getter\StringGetterNode.cs" />
+      <Compile Remove="NodeGraph\Nodes\Variable\Constant\Vector3Node.cs" />
+      <Compile Remove="NodeGraph\Nodes\Variable\Constant\StringNode.cs" />
+      <Compile Remove="NodeGraph\Nodes\Variable\Constant\BooleanNode.cs" />
+      <Compile Remove="CSharpImplementation\NodeSharpVisitor.cs" />
     </ItemGroup>
 
     <ItemGroup>
@@ -74,11 +85,6 @@
 
     <ItemGroup>
       <EmbeddedResource Remove="gen\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="NodeGraph\Nodes\Variable\Getter" />
-      <Folder Include="NodeGraph\Nodes\Variable\Setter" />
     </ItemGroup>
 
 </Project>
