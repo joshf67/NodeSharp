@@ -41,12 +41,14 @@ public class XMLScriptBrain : XMLObject
         var identifierIndexList = XMLReader.GetXContainer(identifierStruct, "list", 3, "uint16", clearOnFind: true);
 
         // Add all identifiers to the correct parts
-         foreach (var var in BrainObject.IdentifierVariables.Values.OrderBy(data => data.NodeData.Identifier))
+         foreach (var var in BrainObject.IdentifierVariables.Values.OrderBy(data => data.Order))
          {
-             if (var.NodeData.Scope == ScopeEnum.Constant || var.NodeData.IdentifierName == "")
-                 continue;
+             // if (var.NodeData.Scope == ScopeEnum.Constant || var.NodeData.IdentifierName == "")
+             //     continue;
 
-             XMLWriter.WriteObjectToContainer(identifierNameList, var.NodeData.IdentifierName, -1);
+             XMLWriter.WriteObjectToContainer(identifierNameList, var.IdentifierName, -1);
+             
+             //Still need to add identifier count
          }
     }
 }
