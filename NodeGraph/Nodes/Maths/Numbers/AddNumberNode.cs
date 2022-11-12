@@ -6,7 +6,7 @@ namespace NodeSharp.NodeGraph.Nodes;
 
 public class AddNumberNode : Node, IGetter
 {
-    public AddNumberNode(ScriptBrain brain, IGetter a, IGetter b) : base(brain, NodeTypes.Add_Number)
+    public AddNumberNode(ScriptBrain brain, IGetter a, IGetter b) : base(brain, NodeTypes.AddNumber)
     {
         ImplementationNodeData = new[]
         {
@@ -25,13 +25,17 @@ public class AddNumberNode : Node, IGetter
             new Pin(Keywords.Result)
         };
         
-        Input.Add(a.Getter(brain, NodeID, Keywords.OperandA));
-        Input.Add(b.Getter(brain, NodeID, Keywords.OperandB));
+        Input.Add(a.Getter(brain, NodeId, Keywords.OperandA));
+        Input.Add(b.Getter(brain, NodeId, Keywords.OperandB));
     }
 
     public VariableConnection Getter(ScriptBrain brain, int destinationId = -1, string destinationPin = "")
     {
-        return new VariableConnection(typeof(float), typeof(DeclareNumberNode), destinationId, destinationPin, NodeID, Keywords.Result);
+        if (Input.Count != 2 || Input[0] is not VariableConnection a || Input[1] is not VariableConnection b)
+            throw new InvalidDataException($"Trying to get result from a AddNumberNode with invalid inputs");
+
+        return new VariableConnection((float)a.Variable + (float)b.Variable, typeof(DeclareNumberNode),
+            destinationId, destinationPin, NodeId, Keywords.Result);
     }
 
     public override bool Optimize(ScriptBrain brain)
@@ -40,7 +44,7 @@ public class AddNumberNode : Node, IGetter
 
         for (int i = 0; i < Input.Count; i++)
         {
-            if (brain.NodeMap[Input[i].OriginNode].node is not VariableNode node) continue;
+            if (brain.NodeMap[Input[i].OriginNode].node is not BaseVariableNode node) continue;
             if (node.NodeData.Scope != ScopeEnum.Constant) continue;
             
             if (Input[i].DestinationPin == Keywords.OperandA)
@@ -52,7 +56,6 @@ public class AddNumberNode : Node, IGetter
                 ImplementationNodeData[0].Values[2].DataValue = node.NodeData.Data;
             }
 
-            brain.RemoveReferenceToNode(node);
             Input.RemoveAt(i);
             i--;
         }
@@ -63,7 +66,7 @@ public class AddNumberNode : Node, IGetter
         var data = new VariableData(
             (float)ImplementationNodeData[0].Values[1].DataValue + (float)ImplementationNodeData[0].Values[2].DataValue,
             scope: ScopeEnum.Constant);
-        var newNode = new DeclareNumberNode(brain, data);
+        var newNode = new NumberNode(brain, data);
         var connector = newNode.Getter(brain);
 
         brain.ReplaceNodeInput(this, newNode, connector.OriginPin);
