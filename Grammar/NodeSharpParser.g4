@@ -2,30 +2,34 @@ parser grammar NodeSharpParser;
 
 options { tokenVocab=NodeSharpLexer; }
 
+
 program: line* EOF;
  
-line: statement | ifBlock | whileBlock;
+line: statement | branchBlock | whileBlock | functionCreation;
 block: '{' line* '}';
 
-statement: ( internal_functionCall | assignment | functionCall) ';';
+statement: (internal_functionCall | assignment | functionCall) ';';
 
-ifBlock: IF '(' expression ')' WHITESPACES*  block WHITESPACES*  (ELSE WHITESPACES*  elseIfBlock);
-elseIfBlock: block | ifBlock;
-whileBlock: 'while' WHITESPACES* '(' expression ')' WHITESPACES*  block;
+conditionalBlock: '(' expression ')' block;
+continueBlock: CONTINUE ';';
+branchBlock: IF conditionalBlock ((ELSE branchBlock) | (ELSE block))?  continueBlock?;
+whileBlock: 'while' conditionalBlock;
 
-assignment: (SCOPE)? IDENTIFIER ASSIGNMENT WHITESPACES* expression;
-functionCall: (SCOPE)? IDENTIFIER '(' expression_list? ')';
-function_creation: (SCOPE)? 'function' WHITESPACES IDENTIFIER '(' expression_list ')' block;
+assignment: (SCOPE)? IDENTIFIER ASSIGNMENT assignmentParameters;
+assignmentParameters: expression | functionCall;
+
+functionCall: (SCOPE)? IDENTIFIER '(' functionParameters? ')';
+functionParameters: (expression | functionCall) (',' (expression | functionCall))*;
+
+functionCreation: (SCOPE)? 'function' IDENTIFIER '(' functionCreationParameters* ')' block;
+functionCreationParameters: IDENTIFIER (',' IDENTIFIER)*;
 
 indexLookup: (SCOPE)? IDENTIFIER '[' expression ']';
 
-array: '[' expression_list ']';
+array: '[' arrayParameters ']';
+arrayParameters: expression (',' expression)*;
 
 getProperty: (SCOPE)? IDENTIFIER '.' IDENTIFIER;
-
-expression_list
-	: expression (WHITESPACES* ',' WHITESPACES* expression)*
-	;
 
 expression
     : getProperty                                                               #getPropertyExpression
@@ -34,12 +38,13 @@ expression
     | '(' expression ')'                                                        #parenthesizedExpression
     | '!' expression                                                            #notExpression
     | (SCOPE)? IDENTIFIER arithmeticOp expression                               #arithmeticExpression
+    | (SCOPE)? IDENTIFIER '^^='                                                 #squareRootAssignmentExpression
     | (SCOPE)? affixOp IDENTIFIER                                               #prefixExpression
     | (SCOPE)? IDENTIFIER affixOp                                               #suffixExpression
     | expression multiplyOp expression                                          #multiplicativeExpression
+    | expression '^^'                                                           #squareRootExpression
     | expression additionOp expression                                          #additiveExpression
     | expression comparisonOp expression                                        #comparisonExpression
-    | function_creation                                                         #functionCreationExpression
     | indexLookup                                                               #indexerExpression
     | array                                                                     #arrayExpression
     ;
@@ -50,9 +55,9 @@ internal_functionCall
     ;
 
 constant: BOOL | VECTOR3 | NUMBER | STRING | AREA_MONITOR | EQUIPMENT_TYPE | GRENADE_TYPE;
-multiplyOp: '*' | '/' | '%' | '^'| '^^';
+multiplyOp: '*' | '/' | '%' | '^';
 additionOp: '+' | '-';
-arithmeticOp: '+=' | '-=' | '*=' | '/=' | '^=' | '^^=';
+arithmeticOp: '+=' | '-=' | '*=' | '/=' | '^=' ;
 affixOp: '++' | '--';
 trigonometryOp: 'Sin' | 'Cos' | 'Tan' | 'Arcsin' | 'Arccos';
 comparisonOp: '==' | '!=' | '>' | '<' | '>=' | '<=';

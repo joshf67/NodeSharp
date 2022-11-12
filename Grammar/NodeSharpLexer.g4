@@ -1,10 +1,12 @@
 lexer grammar NodeSharpLexer;
 
+channels { COMMENTS_CHANNEL }
+
 IF:                     'if';
-ELSE_IF:                'else if';
 ELSE:                   'else';
 WHILE:                  'while';
 FUNCTION:               'function';
+CONTINUE:               'continue';
 
 SIN:                    'Sin';
 COS:                    'Cos';
@@ -53,8 +55,14 @@ OP_MOD_ASSIGNMENT:      '%=';
 OP_POW_ASSIGNMENT:      '^=';
 OP_SQRT_ASSIGNMENT:     '^^=';
 
+COMMENT_LINE:           '//';
+COMMENT_LINE_DOC:       '///';
+COMMENT_BLOCK_START:    '/*';
+COMMENT_BLOCK_END:      '*/';
+COMMENT:                (((COMMENT_LINE | COMMENT_LINE_DOC) (.)*? (NewLine | EOF))
+                        | (COMMENT_BLOCK_START (.)*? (COMMENT_BLOCK_END | EOF))) -> channel(COMMENTS_CHANNEL);
 
-WHITESPACES:   (Whitespace | NewLine)+ -> skip;
+WHITESPACES:            (Whitespace | NewLine)+ -> channel(HIDDEN);
 
 fragment NewLine
 	: '\r\n' | '\r' | '\n'
@@ -102,5 +110,5 @@ AREA_MONITOR: 'AreaMonitor';
 EQUIPMENT_TYPE: 'EquipmentType';
 GRENADE_TYPE: 'GrenadeType';
 
-SCOPE: ('global ' | 'Global ' | 'local ' | 'Local ') WHITESPACES*;
+SCOPE: ('global ' | 'Global ' | 'local ' | 'Local ' | 'param ' | 'Param ') WHITESPACES*;
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
