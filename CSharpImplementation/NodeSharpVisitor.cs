@@ -35,8 +35,8 @@ public class NSharpVisitor : NodeSharpParserBaseVisitor<object?>
         instance = this;
         GlobalFunctions["Write"] = new Func<object?[], object?>(Write);
         
-        // var NodeID = testBrain.AddNode(new DeclareNumberNode(0, (int)ScopeEnum.Global));
-        // var data = new VariableData(0f, NodeID, IdentifierVariables.Count, scope: ScopeEnum.Global);
+        // var NodeId = testBrain.AddNode(new DeclareNumberNode(0, (int)ScopeEnum.Global));
+        // var data = new VariableData(0f, NodeId, IdentifierVariables.Count, scope: ScopeEnum.Global);
         // data.IdentifierName = "InternalFloat";
         //
         // IdentifierVariables.Add("InternalFloat", data);
@@ -311,20 +311,20 @@ public class NSharpVisitor : NodeSharpParserBaseVisitor<object?>
             IdentifierVariables.Add(name, Node);
             
             
-            // var NodeID = testBrain.AddNode(new DeclareNumberNode(0, (int)scope));
-            // data = new VariableData(variable.Data, NodeID, IdentifierVariables.Count, scope: scope);
+            // var NodeId = testBrain.AddNode(new DeclareNumberNode(0, (int)scope));
+            // data = new VariableData(variable.Data, NodeId, IdentifierVariables.Count, scope: scope);
             // data.IdentifierName = name;
             // IdentifierVariables.Add(name, data);
 
             // if (setTo.NodeData.Scope == ScopeEnum.Constant)
             // {
-            //     //testBrain.AddConnection(new NumberConnection(variable.NodeID, NodeID));
+            //     //testBrain.AddConnection(new NumberConnection(variable.NodeId, NodeId));
             // }
             // else
             // {
             //     //var GetterNodeID = 
             //     //testBrain.AddNode(new GetNumberNode((int)scope, data.Identifier));
-            //     //testBrain.AddConnection(new NumberConnection(GetterNodeID, NodeID));
+            //     //testBrain.AddConnection(new NumberConnection(GetterNodeID, NodeId));
             // }
 
             
